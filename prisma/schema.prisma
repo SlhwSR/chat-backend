@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model user {
+  id        Int       @id @default(autoincrement())
+  name      String
+  email     String
+  password  String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  qq        String?
+  wechat    String?
+  phone     String?
+  avatar    String?
+  role      String    @default("user")
+  status    String    @default("normal")
+  friends   user[]    @relation("friends")
+  groups    group[]   @relation("groups")
+  messages  message[] @relation("messages")
+  friendId  Int?
+  friend    user?     @relation("friends", fields: [friendId], references: [id])
+}
+
+model group {
+  id        Int       @id @default(autoincrement())
+  name      String
+  avatar    String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  users     user[]    @relation("groups")
+  messages  message[] @relation("messages")
+}
+
+model message {
+  id        Int      @id @default(autoincrement())
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      user     @relation("messages", fields: [userId], references: [id])
+  userId    Int
+  group     group    @relation("messages", fields: [groupId], references: [id])
+  groupId   Int
+}
